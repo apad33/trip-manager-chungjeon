@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<!-- saved from url=(0119)file:///C:/Users/user/Downloads/%EC%B6%9C%EC%9E%A5%EB%B9%84%EC%A0%95%EC%82%B0%EA%B4%80%EB%A6%AC_%EC%B6%A9%EC%A0%84.html -->
+<html lang="ko"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>출장비 정산 관리 — 충전</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans KR',sans-serif;background:#f5f5f3;color:#1a1a18;font-size:14px;line-height:1.6;}
+.topbar{background:#fff;border-bottom:1px solid #e5e5e2;padding:0 24px;display:flex;align-items:center;height:52px;gap:16px;position:sticky;top:0;z-index:100;}
+.topbar-title{font-size:14px;font-weight:600;color:#1a1a18;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:280px;}
+.topbar-sub{font-size:12px;color:#888;white-space:nowrap;}
+.topbar-actions{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.sync-status{font-size:11px;padding:3px 10px;border-radius:999px;font-weight:500;}
+.sync-ok{background:#e8f5e9;color:#2e7d32;}
+.sync-err{background:#fff3e0;color:#e65100;}
+.sync-ing{background:#e3f0fd;color:#1565c0;}
+.wrap{max-width:960px;margin:0 auto;padding:24px 16px;}
+.tabs{display:flex;gap:2px;margin-bottom:24px;border-bottom:1px solid #e5e5e2;overflow-x:auto;}
+.tab{padding:9px 16px;font-size:13px;font-weight:500;color:#666;background:transparent;border:none;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;}
+.tab.on{color:#1a1a18;border-bottom-color:#1a1a18;}
+.tab:hover:not(.on){color:#1a1a18;}
+.pane{display:none;}.pane.on{display:block;}
+.metric-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:20px;}
+.mc{background:#fff;border:1px solid #e5e5e2;border-radius:10px;padding:14px 16px;}
+.mc-lbl{font-size:12px;color:#888;margin-bottom:5px;}
+.mc-val{font-size:22px;font-weight:600;color:#1a1a18;}
+.mc-sub{font-size:11px;color:#aaa;margin-top:3px;}
+.sec{font-size:11px;font-weight:600;color:#888;letter-spacing:.06em;text-transform:uppercase;margin:20px 0 10px;}
+.sec:first-child{margin-top:0;}
+.card{background:#fff;border:1px solid #e5e5e2;border-radius:12px;padding:16px 20px;margin-bottom:10px;}
+.fg{display:flex;flex-direction:column;gap:5px;margin-bottom:12px;}
+.fg label{font-size:12px;color:#666;font-weight:500;}
+.fg input,.fg select{font-size:13px;padding:8px 10px;border:1px solid #ddd;border-radius:8px;background:#fff;color:#1a1a18;outline:none;transition:border-color .15s;}
+.fg input:focus,.fg select:focus{border-color:#555;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+@media(max-width:600px){.grid2,.grid3{grid-template-columns:1fr 1fr;}}
+@media(max-width:400px){.grid2,.grid3{grid-template-columns:1fr;}}
+.btn{background:#1a1a18;color:#fff;border:none;padding:9px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;}
+.btn:hover{background:#333;}
+.btn-outline{background:#fff;color:#1a1a18;border:1px solid #ddd;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;display:inline-flex;align-items:center;gap:5px;}
+.btn-outline:hover{background:#f5f5f3;}
+.btn-red{background:#fff;color:#a32d2d;border:1px solid #f0c0c0;padding:5px 10px;border-radius:7px;font-size:12px;cursor:pointer;}
+.btn-red:hover{background:#fff5f5;}
+.btn-edit{background:#fff;color:#1a5276;border:1px solid #aed6f1;padding:5px 10px;border-radius:7px;font-size:12px;cursor:pointer;}
+.btn-edit:hover{background:#eaf4fb;}
+.tbl-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed;}
+th{font-weight:600;color:#888;padding:8px 10px;border-bottom:1px solid #e5e5e2;text-align:left;font-size:11px;background:#fafaf8;}
+td{padding:9px 10px;border-bottom:1px solid #f0f0ee;color:#1a1a18;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;vertical-align:middle;}
+tr:hover td{background:#fafaf8;}
+.badge{display:inline-flex;align-items:center;gap:3px;font-size:11px;padding:2px 9px;border-radius:999px;font-weight:600;white-space:nowrap;}
+.b-pend{background:#fff3e0;color:#7c4d00;}
+.b-done{background:#e8f5e9;color:#1b5e20;}
+.b-mine{background:#e3f0fd;color:#0d47a1;}
+.b-other{background:#ede7f6;color:#311b92;}
+.b-gov{background:#e8f5e9;color:#1b5e20;}
+.b-own{background:#fff3e0;color:#7c4d00;}
+.bar-wrap{height:7px;background:#eee;border-radius:4px;margin-top:6px;}
+.bar-fill{height:7px;border-radius:4px;transition:width .3s;}
+.empty{text-align:center;padding:3rem 0;color:#aaa;font-size:13px;}
+.msg{font-size:12px;margin-left:8px;}
+.msg.ok{color:#2e7d32;}.msg.err{color:#c62828;}
+.banner{background:#e3f0fd;border:1px solid #90c2f7;border-radius:10px;padding:11px 16px;font-size:13px;color:#0d47a1;margin-bottom:16px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:200;align-items:center;justify-content:center;padding:16px;overflow-y:auto;}
+.modal-box{background:#fff;border-radius:14px;padding:24px;width:480px;max-width:100%;margin:auto;}
+.modal-box-sm{background:#fff;border-radius:14px;padding:24px;width:380px;max-width:100%;margin:auto;}
+.divider{border:none;border-top:1px solid #f0f0ee;margin:12px 0;}
+.month-summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-bottom:20px;}
+.month-card{background:#fff;border:1px solid #e5e5e2;border-radius:12px;padding:14px 18px;}
+.month-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.month-card-title{font-size:14px;font-weight:700;}
+.month-card-total{font-size:15px;font-weight:700;}
+.month-detail-row{display:flex;justify-content:space-between;font-size:12px;color:#666;padding:3px 0;}
+.month-detail-row span:last-child{font-weight:500;color:#1a1a18;}
+.action-btns{display:flex;gap:5px;}
+.loading-overlay{position:fixed;inset:0;background:rgba(255,255,255,0.85);z-index:300;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;}
+.spinner{width:36px;height:36px;border:3px solid #eee;border-top-color:#1a1a18;border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+</style>
+</head>
+<body>
+
+<div id="loading-overlay" class="loading-overlay" style="display: none;">
+  <div class="spinner"></div>
+  <div style="font-size:13px;color:#888;">데이터 불러오는 중...</div>
+</div>
+
+<div class="topbar">
+  <div>
+    <div class="topbar-title">충전</div>
+    <div class="topbar-sub">출장비 정산 관리</div>
+  </div>
+  <div class="topbar-actions">
+    <span id="sync-status" class="sync-status sync-err">연결 오류</span>
+    <button class="btn-outline" onclick="exportCSV()">📥 엑셀 내보내기</button>
+    <button class="btn-outline" onclick="backupData()">💾 백업</button>
+    <button class="btn-outline" onclick="document.getElementById(&#39;loadFile&#39;).click()">📂 복원</button>
+    <input type="file" id="loadFile" accept=".json" style="display:none" onchange="loadData(event)">
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="tabs">
+    <button class="tab" onclick="go(&#39;dash&#39;)">📊 대시보드</button>
+    <button class="tab on" onclick="go(&#39;monthly&#39;)">📅 월별 합계</button>
+    <button class="tab" onclick="go(&#39;setup&#39;)">⚙️ 설정</button>
+    <button class="tab" onclick="go(&#39;add&#39;)">➕ 출장 등록</button>
+    <button class="tab" onclick="go(&#39;list&#39;)">📋 출장 목록</button>
+    <button class="tab" onclick="go(&#39;settle&#39;)">🧾 정산 현황</button>
+  </div>
+
+  <div id="pane-dash" class="pane">
+    <div id="d-banner"><div class="banner">🚌 <strong>충전</strong> &nbsp;·&nbsp; 담당: 이유나</div></div>
+    <div class="metric-row" id="d-metrics">
+    <div class="mc"><div class="mc-lbl">전체 출장 건수</div><div class="mc-val">0건</div></div>
+    <div class="mc"><div class="mc-lbl">미정산 금액</div><div class="mc-val" style="color:#c62828;">0만원</div><div class="mc-sub" style="color:#c62828;font-weight:500;">0원</div><div class="mc-sub">0건</div></div>
+    <div class="mc"><div class="mc-lbl">정산 완료</div><div class="mc-val" style="color:#2e7d32;">0만원</div><div class="mc-sub" style="color:#2e7d32;font-weight:500;">0원</div><div class="mc-sub">0건</div></div>
+    <div class="mc"><div class="mc-lbl">관차</div><div class="mc-val">0건</div></div>
+    <div class="mc"><div class="mc-lbl">자차</div><div class="mc-val">0건</div></div>
+  </div>
+    <div class="sec">내 사업 예산 현황</div>
+    <div id="d-mybiz"><div style="color:#aaa;font-size:13px;padding:8px 0;">설정 탭에서 월 예산 한도를 입력하면 사용률을 볼 수 있어요</div></div>
+    <div class="sec" style="margin-top:20px;">미정산 출장 전체</div>
+    <div id="d-pend"><div class="empty">✅ 미정산 출장이 없어요</div></div>
+  </div>
+
+  <div id="pane-monthly" class="pane on">
+    <div style="display:flex;gap:8px;margin-bottom:20px;align-items:center;flex-wrap:wrap;">
+      <select id="m-biz" onchange="renderMonthly()" style="font-size:13px;padding:8px 10px;border:1px solid #ddd;border-radius:8px;"><option value="">전체 사업</option><option value="my">충전</option></select>
+      <select id="m-person" onchange="renderMonthly()" style="font-size:13px;padding:8px 10px;border:1px solid #ddd;border-radius:8px;"><option value="">전체 출장자</option></select>
+    </div>
+    <div id="monthly-content"><div class="empty">출장 내역이 없어요</div></div>
+  </div>
+
+  <div id="pane-setup" class="pane">
+    <div class="sec">내 사업 설정</div>
+    <div class="card">
+      <div class="banner"><span>🏢</span><span id="cur-mybiz-text">충전 — 담당자·한도 미설정</span></div>
+      <div class="grid2" style="margin-bottom:12px;">
+        <div class="fg"><label>내 사업명</label><input type="text" id="mb-name" placeholder="충전"></div>
+        <div class="fg"><label>내 이름 (담당자)</label><input type="text" id="mb-owner" placeholder="홍길동"></div>
+      </div>
+      <div class="fg" style="margin-bottom:12px;"><label>월 예산 한도 (원)</label><input type="number" id="mb-budget" placeholder="예: 500000" min="0" style="max-width:200px;"></div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <button class="btn" onclick="saveMyBiz()">💾 저장</button>
+        <span id="mb-msg" class="msg"></span>
+      </div>
+    </div>
+    <div class="sec">타 사업 등록</div>
+    <div class="card">
+      <div class="grid2" style="margin-bottom:12px;">
+        <div class="fg"><label>사업명</label><input type="text" id="ob-name" placeholder="예: B사업"></div>
+        <div class="fg"><label>담당자 이름</label><input type="text" id="ob-owner" placeholder="예: 이서연"></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <button class="btn" onclick="addOtherBiz()">➕ 추가</button>
+        <span id="ob-msg" class="msg"></span>
+      </div>
+    </div>
+    <div id="other-biz-list"></div>
+  </div>
+
+  <div id="pane-add" class="pane">
+    <div class="sec">출장 정보</div>
+    <div class="grid2" style="margin-bottom:12px;">
+      <div class="fg"><label>출장자 이름 *</label><input type="text" id="a-person" placeholder="홍길동"></div>
+      <div class="fg"><label>출장지 *</label><input type="text" id="a-dest" placeholder="서울, 부산 등"></div>
+      <div class="fg"><label>출장 시작일 *</label><input type="date" id="a-start"></div>
+      <div class="fg"><label>출장 종료일 *</label><input type="date" id="a-end"></div>
+      <div class="fg"><label>비용 청구 사업 *</label><select id="a-biz"></select></div>
+      <div class="fg"><label>목적</label><input type="text" id="a-purpose" placeholder="미팅, 현장방문 등"></div>
+    </div>
+    <div class="sec">차량 구분</div>
+    <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+      <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;background:#fff;border:1px solid #ddd;border-radius:8px;padding:9px 16px;">
+        <input type="radio" name="vehicle" id="v-gov" value="관차" checked=""> 🚌 관차
+      </label>
+      <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;background:#fff;border:1px solid #ddd;border-radius:8px;padding:9px 16px;">
+        <input type="radio" name="vehicle" id="v-own" value="자차"> 🚗 자차
+      </label>
+    </div>
+    <div class="sec">비용 입력 (원)</div>
+    <div class="grid3" style="margin-bottom:12px;">
+      <div class="fg"><label>💵 일비</label><input type="number" id="a-da" placeholder="0" min="0"></div>
+      <div class="fg"><label>🍱 식비</label><input type="number" id="a-me" placeholder="0" min="0"></div>
+      <div class="fg"><label>🚆 교통비</label><input type="number" id="a-tr" placeholder="0" min="0"></div>
+    </div>
+    <div class="fg" style="margin-bottom:16px;"><label>메모</label><input type="text" id="a-memo" placeholder="특이사항 (선택)"></div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <button class="btn" onclick="addTrip()">✅ 등록하기</button>
+      <span id="a-msg" class="msg"></span>
+    </div>
+  </div>
+
+  <div id="pane-list" class="pane">
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center;">
+      <input type="text" id="l-search" placeholder="이름 또는 출장지 검색" style="flex:1;min-width:140px;font-size:13px;padding:8px 10px;border:1px solid #ddd;border-radius:8px;outline:none;" oninput="renderList()">
+      <select id="l-biz" onchange="renderList()" style="font-size:13px;padding:8px 10px;border:1px solid #ddd;border-radius:8px;"></select>
+      <select id="l-vehicle" onchange="renderList()" style="font-size:13px;padding:8px 10px;border:1px solid #ddd;border-radius:8px;">
+        <option value="">전체 차량</option><option value="관차">관차</option><option value="자차">자차</option>
+      </select>
+      <select id="l-status" onchange="renderList()" style="font-size:13px;padding:8px 10px;border:1px solid #ddd;border-radius:8px;">
+        <option value="">전체 상태</option><option value="pending">미정산</option><option value="done">정산완료</option>
+      </select>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr>
+          <th style="width:62px;">출장자</th>
+          <th style="width:80px;">사업</th>
+          <th style="width:78px;">날짜</th>
+          <th style="width:46px;">차량</th>
+          <th style="width:52px;">일비</th>
+          <th style="width:52px;">식비</th>
+          <th style="width:52px;">교통비</th>
+          <th style="width:68px;">합계</th>
+          <th style="width:62px;">상태</th>
+          <th style="width:100px;"></th>
+        </tr></thead>
+        <tbody id="l-body"></tbody>
+      </table>
+    </div>
+    <div id="l-empty" class="empty" style="display:none;">📭 출장 내역이 없어요</div>
+  </div>
+
+  <div id="pane-settle" class="pane">
+    <div style="display:flex;gap:8px;margin-bottom:20px;align-items:center;flex-wrap:wrap;">
+      <select id="s-month" onchange="renderSettle()" style="font-size:13px;padding:8px 10px;border:1px solid #ddd;border-radius:8px;"></select>
+      <select id="s-person" onchange="renderSettle()" style="font-size:13px;padding:8px 10px;border:1px solid #ddd;border-radius:8px;"><option value="">전체 출장자</option></select>
+    </div>
+    <div id="s-content"></div>
+  </div>
+</div>
+
+<div class="modal-bg" id="modal-wrap">
+  <div id="modal-inner"></div>
+</div>
+
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyB1I1VR4BLVHNHTtgZQwsMic2GdH7M6yKY",
+  authDomain: "trip-chungjeon.firebaseapp.com",
+  projectId: "trip-chungjeon",
+  storageBucket: "trip-chungjeon.firebasestorage.app",
+  messagingSenderId: "60140872098",
+  appId: "1:60140872098:web:eae352dd4688a5a1c7d2fb",
+  measurementId: "G-01T85SH320"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const DOC_REF = doc(db, "tripdata", "chungjeon");
+
+let myBiz={name:'충전',owner:'이유나',budget:0};
+let otherBiz=[];
+let trips=[];
+let nextId=100;
+let isSaving=false;
+
+function setSyncStatus(type, text){
+  const el=document.getElementById('sync-status');
+  el.className='sync-status sync-'+type;
+  el.textContent=text;
+}
+
+async function persist(){
+  if(isSaving)return;
+  isSaving=true;
+  setSyncStatus('ing','저장 중...');
+  try{
+    await setDoc(DOC_REF,{myBiz,otherBiz,trips,nextId});
+    setSyncStatus('ok','✓ 동기화됨');
+  }catch(e){
+    setSyncStatus('err','저장 실패');
+    console.error(e);
+  }
+  isSaving=false;
+}
+
+// 실시간 동기화 리스너
+onSnapshot(DOC_REF, (snap)=>{
+  if(snap.exists()){
+    const d=snap.data();
+    if(d.myBiz)myBiz=d.myBiz;
+    if(d.otherBiz)otherBiz=d.otherBiz;
+    if(d.trips)trips=d.trips;
+    if(d.nextId)nextId=d.nextId;
+    setSyncStatus('ok','✓ 동기화됨');
+  } else {
+    setSyncStatus('ok','✓ 연결됨');
+  }
+  document.getElementById('loading-overlay').style.display='none';
+  const activeTab=document.querySelector('.tab.on');
+  const tabs=['dash','monthly','setup','add','list','settle'];
+  const idx=Array.from(document.querySelectorAll('.tab')).indexOf(activeTab);
+  const cur=tabs[idx]||'dash';
+  if(cur==='dash')renderDash();
+  if(cur==='monthly')renderMonthly();
+  if(cur==='list')renderList();
+  if(cur==='settle')renderSettle();
+  if(cur==='setup')renderSetup();
+}, (err)=>{
+  setSyncStatus('err','연결 오류');
+  document.getElementById('loading-overlay').style.display='none';
+  console.error(err);
+});
+
+function total(t){return (t.da||0)+(t.me||0)+(t.tr||0);}
+function fmt(n){return Math.round(n).toLocaleString()+'원';}
+function shortName(id){
+  if(id==='my'){const n=myBiz.name||'내 사업';return n.length>9?n.slice(0,9)+'…':n;}
+  const b=otherBiz.find(x=>x.id===id);
+  if(!b)return '?';
+  return b.name.length>9?b.name.slice(0,9)+'…':b.name;
+}
+function bizLabel(id){
+  if(id==='my')return myBiz.name||'내 사업';
+  const b=otherBiz.find(x=>x.id===id);
+  return b?b.name:'?';
+}
+function allBiz(){
+  const arr=[{id:'my',name:'[내 사업] '+myBiz.name}];
+  otherBiz.forEach(b=>arr.push({id:b.id,name:b.name+' ('+b.owner+')'}));
+  return arr;
+}
+
+window.go=function(id){
+  document.querySelectorAll('.tab').forEach((t,i)=>{t.classList.toggle('on',['dash','monthly','setup','add','list','settle'][i]===id);});
+  document.querySelectorAll('.pane').forEach(p=>p.classList.remove('on'));
+  document.getElementById('pane-'+id).classList.add('on');
+  if(id==='dash')renderDash();
+  if(id==='monthly')renderMonthly();
+  if(id==='setup')renderSetup();
+  if(id==='add')populateAddBiz();
+  if(id==='list')renderList();
+  if(id==='settle')renderSettle();
+}
+
+function renderDash(){
+  document.getElementById('d-banner').innerHTML=`<div class="banner">🚌 <strong>${myBiz.name}</strong>${myBiz.owner?' &nbsp;·&nbsp; 담당: '+myBiz.owner:''}${myBiz.budget>0?' &nbsp;·&nbsp; 월 한도 '+fmt(myBiz.budget):''}</div>`;
+  const pend=trips.filter(t=>t.status==='pending');
+  const done=trips.filter(t=>t.status==='done');
+  const tPend=pend.reduce((s,t)=>s+total(t),0);
+  const tDone=done.reduce((s,t)=>s+t.settled,0);
+  document.getElementById('d-metrics').innerHTML=`
+    <div class="mc"><div class="mc-lbl">전체 출장 건수</div><div class="mc-val">${trips.length}건</div></div>
+    <div class="mc"><div class="mc-lbl">미정산 금액</div><div class="mc-val" style="color:#c62828;">${Math.round(tPend/10000)}만원</div><div class="mc-sub" style="color:#c62828;font-weight:500;">${fmt(tPend)}</div><div class="mc-sub">${pend.length}건</div></div>
+    <div class="mc"><div class="mc-lbl">정산 완료</div><div class="mc-val" style="color:#2e7d32;">${Math.round(tDone/10000)}만원</div><div class="mc-sub" style="color:#2e7d32;font-weight:500;">${fmt(tDone)}</div><div class="mc-sub">${done.length}건</div></div>
+    <div class="mc"><div class="mc-lbl">관차</div><div class="mc-val">${trips.filter(t=>t.vehicle==='관차').length}건</div></div>
+    <div class="mc"><div class="mc-lbl">자차</div><div class="mc-val">${trips.filter(t=>t.vehicle==='자차').length}건</div></div>
+  `;
+  const myTrips=trips.filter(t=>t.bizId==='my');
+  const used=myTrips.reduce((s,t)=>s+total(t),0);
+  if(myBiz.budget>0){
+    const pct=Math.min(100,Math.round(used/myBiz.budget*100));
+    const over=used>myBiz.budget;
+    const color=over?'#e53935':pct>80?'#fb8c00':'#1976d2';
+    document.getElementById('d-mybiz').innerHTML=`
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:4px;">
+          <span style="font-weight:600;font-size:13px;">${myBiz.name}</span>
+          <span style="font-size:12px;color:#888;">${myTrips.length}건 출장</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:#888;margin-bottom:5px;">
+          <span>사용 ${fmt(used)}</span><span>한도 ${fmt(myBiz.budget)}</span>
+        </div>
+        <div class="bar-wrap"><div class="bar-fill" style="width:${pct}%;background:${color};"></div></div>
+        <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:12px;">
+          <span style="color:${over?'#c62828':'#aaa'};">${pct}% 사용${over?' ⚠ 한도 초과':''}</span>
+          <span style="color:#888;">잔액 ${over?'(초과) ':''} ${fmt(Math.abs(myBiz.budget-used))}</span>
+        </div>
+      </div>`;
+  } else {
+    document.getElementById('d-mybiz').innerHTML=`<div style="color:#aaa;font-size:13px;padding:8px 0;">설정 탭에서 월 예산 한도를 입력하면 사용률을 볼 수 있어요</div>`;
+  }
+  if(!pend.length){document.getElementById('d-pend').innerHTML='<div class="empty">✅ 미정산 출장이 없어요</div>';return;}
+  document.getElementById('d-pend').innerHTML=`
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>출장자</th><th>사업</th><th>차량</th><th>날짜</th><th>금액</th><th></th></tr></thead>
+      <tbody>${pend.sort((a,b)=>a.start.localeCompare(b.start)).map(t=>`<tr>
+        <td>${t.person}</td>
+        <td><span class="badge ${t.bizId==='my'?'b-mine':'b-other'}">${shortName(t.bizId)}</span></td>
+        <td><span class="badge ${t.vehicle==='관차'?'b-gov':'b-own'}">${t.vehicle||'-'}</span></td>
+        <td style="font-size:11px;">${t.start.slice(5)}</td>
+        <td style="font-weight:600;">${fmt(total(t))}</td>
+        <td><button class="btn-outline" style="padding:4px 10px;font-size:11px;" onclick="openSettle(${t.id})">정산</button></td>
+      </tr>`).join('')}</tbody>
+    </table></div>`;
+}
+
+function renderMonthly(){
+  const bsel=document.getElementById('m-biz');
+  const psel=document.getElementById('m-person');
+  const bf=bsel.value;const pf=psel.value;
+  bsel.innerHTML='<option value="">전체 사업</option>'+allBiz().map(b=>`<option value="${b.id}">${bizLabel(b.id)}</option>`).join('');
+  if(bf)bsel.value=bf;
+  psel.innerHTML='<option value="">전체 출장자</option>'+[...new Set(trips.map(t=>t.person))].sort().map(p=>`<option value="${p}">${p}</option>`).join('');
+  if(pf)psel.value=pf;
+  let filtered=trips.filter(t=>{
+    const mb=!bf||(bf==='my'?t.bizId==='my':t.bizId===parseInt(bf));
+    return mb&&(!pf||t.person===pf);
+  });
+  if(!filtered.length){document.getElementById('monthly-content').innerHTML='<div class="empty">출장 내역이 없어요</div>';return;}
+  const months={};
+  filtered.forEach(t=>{
+    const m=t.start.slice(0,7);
+    if(!months[m])months[m]={da:0,me:0,tr:0,total:0,count:0,pend:0,done:0,gov:0,own:0};
+    months[m].da+=t.da||0;months[m].me+=t.me||0;months[m].tr+=t.tr||0;
+    months[m].total+=total(t);months[m].count++;
+    if(t.status==='pending')months[m].pend++;else months[m].done++;
+    if(t.vehicle==='관차')months[m].gov++;else months[m].own++;
+  });
+  const sm=Object.keys(months).sort().reverse();
+  const gt=sm.reduce((s,m)=>s+months[m].total,0);
+  let html=`<div class="card" style="margin-bottom:20px;background:#f9f9f7;">
+    <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+      <span style="font-weight:700;font-size:15px;">전체 합계</span>
+      <span style="font-size:20px;font-weight:700;">${fmt(gt)}</span>
+    </div>
+    <div style="display:flex;gap:16px;margin-top:8px;font-size:12px;color:#666;flex-wrap:wrap;">
+      <span>총 ${filtered.length}건</span>
+      <span>일비 ${fmt(sm.reduce((s,m)=>s+months[m].da,0))}</span>
+      <span>식비 ${fmt(sm.reduce((s,m)=>s+months[m].me,0))}</span>
+      <span>교통비 ${fmt(sm.reduce((s,m)=>s+months[m].tr,0))}</span>
+    </div>
+  </div><div class="month-summary-grid">`;
+  sm.forEach(m=>{
+    const d=months[m];const[y,mo]=m.split('-');
+    html+=`<div class="month-card">
+      <div class="month-card-header"><span class="month-card-title">${y}년 ${parseInt(mo)}월</span><span class="month-card-total">${fmt(d.total)}</span></div>
+      <div class="month-detail-row"><span>출장 건수</span><span>${d.count}건 (관차 ${d.gov}/자차 ${d.own})</span></div>
+      <div class="month-detail-row"><span>💵 일비</span><span>${fmt(d.da)}</span></div>
+      <div class="month-detail-row"><span>🍱 식비</span><span>${fmt(d.me)}</span></div>
+      <div class="month-detail-row"><span>🚆 교통비</span><span>${fmt(d.tr)}</span></div>
+      <hr class="divider">
+      <div class="month-detail-row"><span>정산</span><span>
+        ${d.pend>0?`<span class="badge b-pend" style="font-size:10px;">미정산 ${d.pend}</span> `:''}
+        ${d.done>0?`<span class="badge b-done" style="font-size:10px;">완료 ${d.done}</span>`:''}
+      </span></div>
+    </div>`;
+  });
+  document.getElementById('monthly-content').innerHTML=html+'</div>';
+}
+
+function renderSetup(){
+  document.getElementById('cur-mybiz-text').textContent=`${myBiz.name||'충전'}${myBiz.owner?' · '+myBiz.owner:''}${myBiz.budget>0?' · 한도 '+fmt(myBiz.budget):''}`;
+  document.getElementById('mb-name').value=myBiz.name||'';
+  document.getElementById('mb-owner').value=myBiz.owner||'';
+  document.getElementById('mb-budget').value=myBiz.budget||'';
+  document.getElementById('other-biz-list').innerHTML=otherBiz.length?otherBiz.map(b=>`
+    <div class="card" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+      <div><strong>${b.name}</strong> <span style="font-size:12px;color:#888;">· 담당: ${b.owner}</span></div>
+      <button class="btn-red" onclick="delOther(${b.id})">🗑 삭제</button>
+    </div>`).join(''):'<div style="color:#aaa;font-size:13px;padding:4px 0;">등록된 타 사업이 없어요</div>';
+}
+
+window.saveMyBiz=async function(){
+  const name=document.getElementById('mb-name').value.trim()||'충전';
+  const owner=document.getElementById('mb-owner').value.trim();
+  const budget=parseInt(document.getElementById('mb-budget').value)||0;
+  if(!owner){showMsg('mb-msg','담당자 이름을 입력해 주세요','err');return;}
+  myBiz={name,owner,budget};
+  await persist();
+  showMsg('mb-msg','저장 완료!','ok');
+  renderSetup();
+}
+
+window.addOtherBiz=async function(){
+  const name=document.getElementById('ob-name').value.trim();
+  const owner=document.getElementById('ob-owner').value.trim();
+  if(!name||!owner){showMsg('ob-msg','사업명과 담당자를 입력해 주세요','err');return;}
+  otherBiz.push({id:nextId++,name,owner});
+  document.getElementById('ob-name').value='';
+  document.getElementById('ob-owner').value='';
+  await persist();
+  showMsg('ob-msg','추가 완료!','ok');
+  renderSetup();
+}
+
+window.delOther=async function(id){
+  if(!confirm('이 사업을 삭제할까요?'))return;
+  otherBiz=otherBiz.filter(b=>b.id!==id);
+  await persist();
+  renderSetup();
+}
+
+function populateAddBiz(){
+  document.getElementById('a-biz').innerHTML=allBiz().map(b=>`<option value="${b.id}">${b.name}</option>`).join('');
+}
+
+window.addTrip=async function(){
+  const person=document.getElementById('a-person').value.trim();
+  const dest=document.getElementById('a-dest').value.trim();
+  const start=document.getElementById('a-start').value;
+  const end=document.getElementById('a-end').value;
+  const raw=document.getElementById('a-biz').value;
+  const bizId=raw==='my'?'my':parseInt(raw);
+  const purpose=document.getElementById('a-purpose').value.trim();
+  const vehicle=document.querySelector('input[name="vehicle"]:checked').value;
+  const da=parseInt(document.getElementById('a-da').value)||0;
+  const me=parseInt(document.getElementById('a-me').value)||0;
+  const tr=parseInt(document.getElementById('a-tr').value)||0;
+  const memo=document.getElementById('a-memo').value.trim();
+  if(!person||!dest||!start||!end){showMsg('a-msg','* 필수 항목을 모두 입력해 주세요','err');return;}
+  trips.push({id:nextId++,person,dest,start,end,bizId,purpose,vehicle,da,me,tr,memo,status:'pending',settled:0});
+  ['a-person','a-dest','a-start','a-end','a-purpose','a-da','a-me','a-tr','a-memo'].forEach(id=>{document.getElementById(id).value='';});
+  document.getElementById('v-gov').checked=true;
+  await persist();
+  showMsg('a-msg','✅ 등록 완료!','ok');
+}
+
+function renderList(){
+  const q=(document.getElementById('l-search').value||'').toLowerCase();
+  const bsel=document.getElementById('l-biz');
+  const bf=bsel.value;
+  const vf=document.getElementById('l-vehicle').value;
+  const sf=document.getElementById('l-status').value;
+  bsel.innerHTML='<option value="">전체 사업</option>'+allBiz().map(b=>`<option value="${b.id}">${bizLabel(b.id)}</option>`).join('');
+  if(bf)bsel.value=bf;
+  let list=[...trips].filter(t=>{
+    return (!q||t.person.toLowerCase().includes(q)||t.dest.toLowerCase().includes(q))
+      &&(!bf||(bf==='my'?t.bizId==='my':t.bizId===parseInt(bf)))
+      &&(!vf||t.vehicle===vf)
+      &&(!sf||t.status===sf);
+  }).sort((a,b)=>b.start.localeCompare(a.start));
+  document.getElementById('l-empty').style.display=list.length?'none':'block';
+  document.getElementById('l-body').innerHTML=list.map(t=>`<tr>
+    <td>${t.person}</td>
+    <td><span class="badge ${t.bizId==='my'?'b-mine':'b-other'}">${shortName(t.bizId)}</span></td>
+    <td style="font-size:11px;">${t.start.slice(5)}~${t.end.slice(5)}</td>
+    <td><span class="badge ${t.vehicle==='관차'?'b-gov':'b-own'}" style="font-size:10px;">${t.vehicle||'-'}</span></td>
+    <td>${(t.da||0).toLocaleString()}</td>
+    <td>${(t.me||0).toLocaleString()}</td>
+    <td>${(t.tr||0).toLocaleString()}</td>
+    <td style="font-weight:600;">${fmt(total(t))}</td>
+    <td>${t.status==='done'?'<span class="badge b-done">✓ 완료</span>':'<span class="badge b-pend">미정산</span>'}</td>
+    <td><div class="action-btns">
+      <button class="btn-edit" onclick="openEdit(${t.id})">✏️</button>
+      <button class="btn-red" onclick="deleteTrip(${t.id})">🗑</button>
+      ${t.status==='pending'?`<button class="btn-outline" style="padding:4px 8px;font-size:11px;" onclick="openSettle(${t.id})">정산</button>`:`<button class="btn-red" onclick="unSettle(${t.id})">취소</button>`}
+    </div></td>
+  </tr>`).join('');
+}
+
+window.openEdit=function(id){
+  const t=trips.find(x=>x.id===id);
+  if(!t)return;
+  const bizOpts=allBiz().map(b=>`<option value="${b.id}"${(t.bizId===b.id||t.bizId===String(b.id))?'selected':''}>${b.name}</option>`).join('');
+  document.getElementById('modal-inner').innerHTML=`
+    <div class="modal-box">
+      <div style="font-weight:700;font-size:16px;margin-bottom:16px;">✏️ 출장 수정</div>
+      <div class="grid2" style="margin-bottom:10px;">
+        <div class="fg"><label>출장자 *</label><input type="text" id="e-person" value="${t.person}"></div>
+        <div class="fg"><label>출장지 *</label><input type="text" id="e-dest" value="${t.dest}"></div>
+        <div class="fg"><label>시작일 *</label><input type="date" id="e-start" value="${t.start}"></div>
+        <div class="fg"><label>종료일 *</label><input type="date" id="e-end" value="${t.end}"></div>
+        <div class="fg"><label>사업</label><select id="e-biz">${bizOpts}</select></div>
+        <div class="fg"><label>목적</label><input type="text" id="e-purpose" value="${t.purpose||''}"></div>
+      </div>
+      <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;">
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;background:#fff;border:1px solid #ddd;border-radius:8px;padding:8px 14px;">
+          <input type="radio" name="evehicle" value="관차" ${t.vehicle==='관차'?'checked':''}> 🚌 관차
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;background:#fff;border:1px solid #ddd;border-radius:8px;padding:8px 14px;">
+          <input type="radio" name="evehicle" value="자차" ${t.vehicle==='자차'?'checked':''}> 🚗 자차
+        </label>
+      </div>
+      <div class="grid3" style="margin-bottom:10px;">
+        <div class="fg"><label>💵 일비</label><input type="number" id="e-da" value="${t.da||0}" min="0"></div>
+        <div class="fg"><label>🍱 식비</label><input type="number" id="e-me" value="${t.me||0}" min="0"></div>
+        <div class="fg"><label>🚆 교통비</label><input type="number" id="e-tr" value="${t.tr||0}" min="0"></div>
+      </div>
+      <div class="fg" style="margin-bottom:16px;"><label>메모</label><input type="text" id="e-memo" value="${t.memo||''}"></div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <button class="btn" onclick="saveEdit(${id})">💾 저장</button>
+        <button class="btn-outline" onclick="closeModal()">취소</button>
+        <span id="e-msg" class="msg"></span>
+      </div>
+    </div>`;
+  document.getElementById('modal-wrap').style.display='flex';
+}
+
+window.saveEdit=async function(id){
+  const t=trips.find(x=>x.id===id);
+  if(!t)return;
+  const person=document.getElementById('e-person').value.trim();
+  const dest=document.getElementById('e-dest').value.trim();
+  const start=document.getElementById('e-start').value;
+  const end=document.getElementById('e-end').value;
+  if(!person||!dest||!start||!end){showMsg('e-msg','필수 항목을 입력해 주세요','err');return;}
+  const raw=document.getElementById('e-biz').value;
+  t.person=person;t.dest=dest;t.start=start;t.end=end;
+  t.bizId=raw==='my'?'my':parseInt(raw);
+  t.purpose=document.getElementById('e-purpose').value.trim();
+  t.vehicle=document.querySelector('input[name="evehicle"]:checked').value;
+  t.da=parseInt(document.getElementById('e-da').value)||0;
+  t.me=parseInt(document.getElementById('e-me').value)||0;
+  t.tr=parseInt(document.getElementById('e-tr').value)||0;
+  t.memo=document.getElementById('e-memo').value.trim();
+  await persist();
+  closeModal();
+  renderList();
+}
+
+window.deleteTrip=async function(id){
+  if(!confirm('이 출장 내역을 삭제할까요?'))return;
+  trips=trips.filter(t=>t.id!==id);
+  await persist();
+  renderList();
+}
+
+function renderSettle(){
+  const months=[...new Set(trips.map(t=>t.start.slice(0,7)))].sort();
+  if(!months.length){document.getElementById('s-content').innerHTML='<div class="empty">출장 내역이 없어요</div>';return;}
+  const msel=document.getElementById('s-month');
+  const cur=msel.value||months[months.length-1];
+  msel.innerHTML=months.map(m=>{const[y,mo]=m.split('-');return`<option value="${m}">${y}년 ${parseInt(mo)}월</option>`;}).join('');
+  msel.value=cur||months[months.length-1];
+  const mon=msel.value;
+  const people=[...new Set(trips.filter(t=>t.start.startsWith(mon)).map(t=>t.person))].sort();
+  const psel=document.getElementById('s-person');
+  const curP=psel.value;
+  psel.innerHTML='<option value="">전체 출장자</option>'+people.map(p=>`<option value="${p}">${p}</option>`).join('');
+  if(curP)psel.value=curP;
+  const fp=psel.value;
+  let list=trips.filter(t=>t.start.startsWith(mon)&&(!fp||t.person===fp));
+  list.sort((a,b)=>a.person.localeCompare(b.person)||a.start.localeCompare(b.start));
+  if(!list.length){document.getElementById('s-content').innerHTML='<div class="empty">해당 월 출장 내역이 없어요</div>';return;}
+  const byPerson={};
+  list.forEach(t=>{if(!byPerson[t.person])byPerson[t.person]=[];byPerson[t.person].push(t);});
+  document.getElementById('s-content').innerHTML=Object.entries(byPerson).map(([name,ts])=>{
+    const ttl=ts.reduce((s,t)=>s+total(t),0);
+    const pendAmt=ts.filter(t=>t.status==='pending').reduce((s,t)=>s+total(t),0);
+    const doneAmt=ts.filter(t=>t.status==='done').reduce((s,t)=>s+t.settled,0);
+    return `<div class="card" style="margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:6px;">
+        <span style="font-weight:700;font-size:15px;">${name}</span>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          ${pendAmt>0?`<span class="badge b-pend">미정산 ${fmt(pendAmt)}</span>`:''}
+          ${doneAmt>0?`<span class="badge b-done">완료 ${fmt(doneAmt)}</span>`:''}
+        </div>
+      </div>
+      ${ts.map(t=>`<div style="border-top:1px solid #f0f0ee;padding:10px 0;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
+        <div>
+          <div style="font-size:13px;font-weight:600;">${t.dest}
+            <span class="badge ${t.bizId==='my'?'b-mine':'b-other'}" style="font-size:10px;">${shortName(t.bizId)}</span>
+            <span class="badge ${t.vehicle==='관차'?'b-gov':'b-own'}" style="font-size:10px;">${t.vehicle||''}</span>
+          </div>
+          <div style="font-size:11px;color:#aaa;margin-top:3px;">${t.start}${t.end!==t.start?' ~ '+t.end:''} · 일비 ${(t.da||0).toLocaleString()} · 식비 ${(t.me||0).toLocaleString()} · 교통 ${(t.tr||0).toLocaleString()}${t.memo?' · '+t.memo:''}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+          <span style="font-weight:700;font-size:14px;">${fmt(total(t))}</span>
+          <button class="btn-edit" style="padding:4px 8px;font-size:11px;" onclick="openEdit(${t.id})">✏️</button>
+          ${t.status==='done'
+            ?`<span class="badge b-done">✓ 완료 (${fmt(t.settled)})</span><button class="btn-red" onclick="unSettle(${t.id});renderSettle();">취소</button>`
+            :`<button class="btn-outline" onclick="openSettle(${t.id})">정산 처리</button>`}
+        </div>
+      </div>`).join('')}
+      <hr class="divider">
+      <div style="display:flex;justify-content:space-between;font-size:13px;">
+        <span style="color:#888;">이번 달 합계</span><span style="font-weight:700;">${fmt(ttl)}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+window.openSettle=function(id){
+  const t=trips.find(x=>x.id===id);
+  if(!t)return;
+  const tot=total(t);
+  document.getElementById('modal-inner').innerHTML=`
+    <div class="modal-box-sm">
+      <div style="font-weight:700;font-size:16px;margin-bottom:14px;">🧾 정산 처리</div>
+      <div style="font-size:13px;color:#888;margin-bottom:4px;">${t.person} · ${t.dest} ·
+        <span class="badge ${t.bizId==='my'?'b-mine':'b-other'}">${shortName(t.bizId)}</span>
+        <span class="badge ${t.vehicle==='관차'?'b-gov':'b-own'}">${t.vehicle||''}</span>
+      </div>
+      <div style="font-size:12px;color:#aaa;margin-bottom:16px;">일비 ${fmt(t.da||0)} · 식비 ${fmt(t.me||0)} · 교통비 ${fmt(t.tr||0)}</div>
+      <div style="font-weight:600;font-size:15px;margin-bottom:16px;">청구 금액: ${fmt(tot)}</div>
+      <div class="fg" style="margin-bottom:12px;"><label>실제 정산 금액 (원)</label><input type="number" id="s-amt" value="${tot}" min="0" style="font-size:15px;padding:10px;"></div>
+      <div class="fg" style="margin-bottom:18px;"><label>메모</label><input type="text" id="s-memo" placeholder="정산 메모 (선택)"></div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn" onclick="doSettle(${id})">✅ 완료 처리</button>
+        <button class="btn-outline" onclick="closeModal()">취소</button>
+      </div>
+    </div>`;
+  document.getElementById('modal-wrap').style.display='flex';
+}
+
+window.doSettle=async function(id){
+  const amt=parseInt(document.getElementById('s-amt').value)||0;
+  const t=trips.find(x=>x.id===id);
+  if(t){t.status='done';t.settled=amt;}
+  await persist();
+  closeModal();
+  const tabs=['dash','monthly','setup','add','list','settle'];
+  const idx=Array.from(document.querySelectorAll('.tab')).findIndex(el=>el.classList.contains('on'));
+  const cur=tabs[idx];
+  if(cur==='dash')renderDash();
+  if(cur==='monthly')renderMonthly();
+  if(cur==='list')renderList();
+  if(cur==='settle')renderSettle();
+}
+
+window.unSettle=async function(id){
+  const t=trips.find(x=>x.id===id);
+  if(t){t.status='pending';t.settled=0;}
+  await persist();
+  renderList();
+}
+
+window.closeModal=function(){document.getElementById('modal-wrap').style.display='none';}
+document.getElementById('modal-wrap').addEventListener('click',function(e){if(e.target===this)window.closeModal();});
+
+window.renderSettle=renderSettle;
+window.renderDash=renderDash;
+window.renderList=renderList;
+window.renderMonthly=renderMonthly;
+window.renderSetup=renderSetup;
+
+function showMsg(id,txt,type){
+  const el=document.getElementById(id);
+  if(!el)return;
+  el.textContent=txt;el.className='msg '+type;
+  setTimeout(()=>{el.textContent='';},2500);
+}
+
+window.backupData=function(){
+  const data=JSON.stringify({myBiz,otherBiz,trips,nextId},null,2);
+  const blob=new Blob([data],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`출장비백업_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+window.loadData=async function(e){
+  const file=e.target.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=async function(ev){
+    try{
+      const d=JSON.parse(ev.target.result);
+      if(d.myBiz)myBiz=d.myBiz;
+      if(d.otherBiz)otherBiz=d.otherBiz;
+      if(d.trips)trips=d.trips;
+      if(d.nextId)nextId=d.nextId;
+      await persist();
+      renderDash();
+      alert('✅ 복원 완료!');
+    }catch(err){alert('❌ 파일을 읽을 수 없어요.');}
+  };
+  reader.readAsText(file);
+  e.target.value='';
+}
+
+function fmtDate(d){
+  if(!d)return '';
+  const parts=d.split('-');
+  if(parts.length!==3)return d;
+  return parts[0].slice(2)+'-'+parts[1]+'-'+parts[2];
+}
+function fmtBiz(id){
+  if(id==='my'){const n=myBiz.name||'충전';if(n.includes('충전'))return '충전';return n;}
+  const b=otherBiz.find(x=>x.id===id);return b?b.name:'';
+}
+
+window.exportCSV=function(){
+  if(!trips.length){alert('출장 내역이 없어요.');return;}
+
+  // 필터 옵션 구성
+  const months=[...new Set(trips.map(t=>t.start.slice(0,7)))].sort();
+  const people=[...new Set(trips.map(t=>t.person))].sort();
+
+  const monthOpts=months.map(m=>{
+    const[y,mo]=m.split('-');
+    return `<option value="${m}">${y}년 ${parseInt(mo)}월</option>`;
+  }).join('');
+
+  const personOpts=people.map(p=>`<option value="${p}">${p}</option>`).join('');
+  const bizOpts=allBiz().map(b=>`<option value="${b.id}">${bizLabel(b.id)}</option>`).join('');
+
+  document.getElementById('modal-inner').innerHTML=`
+    <div class="modal-box-sm">
+      <div style="font-weight:700;font-size:16px;margin-bottom:16px;">📥 엑셀 내보내기</div>
+      <div style="font-size:12px;color:#888;margin-bottom:14px;">필터를 선택하지 않으면 전체 내보내기</div>
+      <div class="fg"><label>📅 월 선택</label>
+        <select id="ex-month" style="font-size:13px;padding:8px 10px;border:1px solid #ddd;border-radius:8px;">
+          <option value="">전체 월</option>${monthOpts}
+        </select>
+      </div>
+      <div class="fg"><label>👤 출장자 선택</label>
+        <select id="ex-person" style="font-size:13px;padding:8px 10px;border:1px solid #ddd;border-radius:8px;">
+          <option value="">전체 출장자</option>${personOpts}
+        </select>
+      </div>
+      <div class="fg" style="margin-bottom:18px;"><label>🏢 사업 선택</label>
+        <select id="ex-biz" style="font-size:13px;padding:8px 10px;border:1px solid #ddd;border-radius:8px;">
+          <option value="">전체 사업</option>${bizOpts}
+        </select>
+      </div>
+      <div id="ex-count" style="font-size:12px;color:#666;margin-bottom:14px;"></div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn" onclick="doExportCSV()">📥 내보내기</button>
+        <button class="btn-outline" onclick="closeModal()">취소</button>
+      </div>
+    </div>`;
+  document.getElementById('modal-wrap').style.display='flex';
+
+  // 실시간 건수 표시
+  function updateCount(){
+    const mf=document.getElementById('ex-month').value;
+    const pf=document.getElementById('ex-person').value;
+    const bf=document.getElementById('ex-biz').value;
+    const cnt=trips.filter(t=>{
+      const mm=!mf||t.start.startsWith(mf);
+      const mp=!pf||t.person===pf;
+      const mb=!bf||(bf==='my'?t.bizId==='my':t.bizId===parseInt(bf));
+      return mm&&mp&&mb;
+    }).length;
+    document.getElementById('ex-count').textContent=`→ ${cnt}건 내보내기 예정`;
+  }
+  setTimeout(()=>{
+    document.getElementById('ex-month').addEventListener('change',updateCount);
+    document.getElementById('ex-person').addEventListener('change',updateCount);
+    document.getElementById('ex-biz').addEventListener('change',updateCount);
+    updateCount();
+  },50);
+}
+
+window.doExportCSV=function(){
+  const mf=document.getElementById('ex-month').value;
+  const pf=document.getElementById('ex-person').value;
+  const bf=document.getElementById('ex-biz').value;
+
+  let filtered=[...trips].filter(t=>{
+    const mm=!mf||t.start.startsWith(mf);
+    const mp=!pf||t.person===pf;
+    const mb=!bf||(bf==='my'?t.bizId==='my':t.bizId===parseInt(bf));
+    return mm&&mp&&mb;
+  }).sort((a,b)=>a.start.localeCompare(b.start));
+
+  if(!filtered.length){alert('해당 조건의 출장 내역이 없어요.');return;}
+
+  const BOM='\uFEFF';
+  const header=['출장구분','사업비','출장시작일자','출장종료일자','출장지','목적','일비','식비','교통비','합계'];
+  const rows=filtered.map(t=>[
+    '국내/관외',fmtBiz(t.bizId),fmtDate(t.start),fmtDate(t.end),
+    t.dest,t.purpose||'',t.da||0,t.me||0,t.tr||0,total(t)
+  ].map(v=>`"${String(v).replace(/"/g,'""')}"`).join(','));
+
+  const csv=BOM+[header.join(','),...rows].join('\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+
+  // 파일명에 필터 조건 반영
+  let fname='출장비내역';
+  if(mf){const[y,mo]=mf.split('-');fname+=`_${y.slice(2)}년${parseInt(mo)}월`;}
+  if(pf)fname+=`_${pf}`;
+  if(bf)fname+=`_${bizLabel(bf==='my'?'my':parseInt(bf))}`;
+  fname+=`_${new Date().toISOString().slice(0,10)}`;
+
+  a.download=`${fname}.csv`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  closeModal();
+}
+
+</script>
+
+
+</body></html>
